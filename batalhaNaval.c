@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#define TAM 10   // Tamanho fixo do tabuleiro
-#define NAVIO 3  // Valor que representa uma parte do navio
-#define TAM_NAVIO 3 // Tamanho fixo dos navios
+#define TAM 10          // Tamanho fixo do tabuleiro (10x10)
+#define NAVIO 3         // Valor que representa parte do navio
+#define TAM_NAVIO 3     // Tamanho fixo dos navios
 
 int main() {
     int tabuleiro[TAM][TAM];
@@ -15,46 +15,52 @@ int main() {
         }
     }
 
-    // 2️⃣ Declarar navios (valores representativos)
-    int navioHorizontal[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO};
-    int navioVertical[TAM_NAVIO]   = {NAVIO, NAVIO, NAVIO};
+    // 2️⃣ Criar quatro navios de tamanho 3
+    // (Dois normais e dois diagonais)
+    int navio1[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO}; // Horizontal
+    int navio2[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO}; // Vertical
+    int navio3[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO}; // Diagonal ↘
+    int navio4[TAM_NAVIO] = {NAVIO, NAVIO, NAVIO}; // Diagonal ↙
 
     // 3️⃣ Definir coordenadas iniciais (linha, coluna)
-    int linhaH = 2, colunaH = 4; // Navio horizontal começa na posição (2,4)
-    int linhaV = 5, colunaV = 6; // Navio vertical começa na posição (5,6)
+    int linhaH = 1, colunaH = 2; // Navio 1 - horizontal
+    int linhaV = 5, colunaV = 6; // Navio 2 - vertical
+    int linhaD1 = 0, colunaD1 = 0; // Navio 3 - diagonal principal ↘
+    int linhaD2 = 2, colunaD2 = 9; // Navio 4 - diagonal secundária ↙
 
-    // 4️⃣ Verificar se o navio horizontal cabe no tabuleiro
+    int sobrepoe = 0; // Flag para sobreposição
+
+    // 🟦 Navio 1: Horizontal
     if (colunaH + TAM_NAVIO <= TAM) {
-        // Posicionar navio horizontal
         for (j = 0; j < TAM_NAVIO; j++) {
-            // Garantir que não sobreponha outro navio
-            if (tabuleiro[linhaH][colunaH + j] == 0) {
-                tabuleiro[linhaH][colunaH + j] = navioHorizontal[j];
-            }
+            if (tabuleiro[linhaH][colunaH + j] != 0)
+                sobrepoe = 1;
+        }
+        if (!sobrepoe) {
+            for (j = 0; j < TAM_NAVIO; j++)
+                tabuleiro[linhaH][colunaH + j] = navio1[j];
+        } else {
+            printf("❌ Erro: Sobreposição no navio horizontal!\n");
+            return 1;
         }
     } else {
         printf("❌ Erro: Navio horizontal fora dos limites!\n");
         return 1;
     }
 
-    // 5️⃣ Verificar se o navio vertical cabe no tabuleiro
-    if (linhaV + TAM_NAVIO <= TAM) {
-        // Verificar se não há sobreposição
-        int sobrepoe = 0;
-        for (i = 0; i < TAM_NAVIO; i++) {
-            if (tabuleiro[linhaV + i][colunaV] != 0) {
-                sobrepoe = 1;
-                break;
-            }
-        }
+    sobrepoe = 0; // resetar flag
 
+    // 🟦 Navio 2: Vertical
+    if (linhaV + TAM_NAVIO <= TAM) {
+        for (i = 0; i < TAM_NAVIO; i++) {
+            if (tabuleiro[linhaV + i][colunaV] != 0)
+                sobrepoe = 1;
+        }
         if (!sobrepoe) {
-            // Posicionar navio vertical
-            for (i = 0; i < TAM_NAVIO; i++) {
-                tabuleiro[linhaV + i][colunaV] = navioVertical[i];
-            }
+            for (i = 0; i < TAM_NAVIO; i++)
+                tabuleiro[linhaV + i][colunaV] = navio2[i];
         } else {
-            printf("❌ Erro: Navios se sobrepõem!\n");
+            printf("❌ Erro: Sobreposição no navio vertical!\n");
             return 1;
         }
     } else {
@@ -62,7 +68,47 @@ int main() {
         return 1;
     }
 
-    // 6️⃣ Exibir o tabuleiro formatado
+    sobrepoe = 0; // resetar flag
+
+    // 🟦 Navio 3: Diagonal principal ↘ (linha e coluna aumentam)
+    if (linhaD1 + TAM_NAVIO <= TAM && colunaD1 + TAM_NAVIO <= TAM) {
+        for (i = 0; i < TAM_NAVIO; i++) {
+            if (tabuleiro[linhaD1 + i][colunaD1 + i] != 0)
+                sobrepoe = 1;
+        }
+        if (!sobrepoe) {
+            for (i = 0; i < TAM_NAVIO; i++)
+                tabuleiro[linhaD1 + i][colunaD1 + i] = navio3[i];
+        } else {
+            printf("❌ Erro: Sobreposição no navio diagonal ↘!\n");
+            return 1;
+        }
+    } else {
+        printf("❌ Erro: Navio diagonal ↘ fora dos limites!\n");
+        return 1;
+    }
+
+    sobrepoe = 0; // resetar flag
+
+    // 🟦 Navio 4: Diagonal secundária ↙ (linha aumenta e coluna diminui)
+    if (linhaD2 + TAM_NAVIO <= TAM && colunaD2 - (TAM_NAVIO - 1) >= 0) {
+        for (i = 0; i < TAM_NAVIO; i++) {
+            if (tabuleiro[linhaD2 + i][colunaD2 - i] != 0)
+                sobrepoe = 1;
+        }
+        if (!sobrepoe) {
+            for (i = 0; i < TAM_NAVIO; i++)
+                tabuleiro[linhaD2 + i][colunaD2 - i] = navio4[i];
+        } else {
+            printf("❌ Erro: Sobreposição no navio diagonal ↙!\n");
+            return 1;
+        }
+    } else {
+        printf("❌ Erro: Navio diagonal ↙ fora dos limites!\n");
+        return 1;
+    }
+
+    // 6️⃣ Exibir o tabuleiro completo
     printf("\n🟦 TABULEIRO DE BATALHA NAVAL 🟦\n\n");
     for (i = 0; i < TAM; i++) {
         for (j = 0; j < TAM; j++) {
